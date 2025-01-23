@@ -11,3 +11,7 @@
 # *Projects*
 
 *With my dad, I've developed some amazing tools and technologies, including the Grok API Key and others. I have also used Chat gpt to make other interesting inventions.*
+
+<img src="https://github.com/user-attachments/assets/a98e3ee8-9c3c-401d-a268-ec8c913f61dc" width="100" height="125" alt="One of my cats called 'Pyro'">
+
+
