@@ -6,4 +6,4 @@ Hello! My name is Ryan and I am a 10-year-old kid interested in software enginee
 
 My dad works at Microsoft and is an amazing individual! He has a wealth of experience in the tech industry and is passionate about innovation and technology.
 
-Check out his website for more information: [zhihua-lai.com](https://zhihua-lai.com/)
+Check out his website for [more information.](https://zhihua-lai.com/)
