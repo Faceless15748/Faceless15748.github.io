@@ -14,6 +14,6 @@
  
  >***Projects***
 
->*With my dad, I've developed some amazing tools and technologies, including the Grok API Key and others. I have also used Chat gpt to make other interesting inventions.*
+>*With my dad, I've developed amazing tools and technologies, including the Grok API Key and others. I have also used Chat GPT to make other interesting inventions.*
 
-\
+>I am interested in the AI market, so I have been researching the tech industry to learn about other things and to know what is happening in the global market for tech.
