@@ -1,191 +1,161 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Space Invaders</title>
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background-color: black;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-    }
+import pygame
+import random
 
-    canvas {
-      display: block;
-      margin: 0 auto;
-      background-color: #000;
-    }
+# Initialize PyGame
+pygame.init()
 
-    h1 {
-      margin-top: 20px;
-    }
-  </style>
-</head>
-<body>
-  <h1>Space Invaders</h1>
-  <canvas id="gameCanvas"></canvas>
+# Screen dimensions
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Space Invaders")
 
-  <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
 
-    // Set canvas dimensions
-    canvas.width = 800;
-    canvas.height = 600;
+# Clock for controlling frame rate
+clock = pygame.time.Clock()
 
-    // Game variables
-    const playerWidth = 50;
-    const playerHeight = 20;
-    const playerSpeed = 5;
-    const bulletSpeed = 7;
-    const enemySpeed = 2;
-    const enemyRows = 3;
-    const enemyCols = 8;
-    const enemyPadding = 20;
+# Player settings
+player_width = 50
+player_height = 20
+player_x = SCREEN_WIDTH // 2 - player_width // 2
+player_y = SCREEN_HEIGHT - 50
+player_speed = 5
 
-    let playerX = canvas.width / 2 - playerWidth / 2;
-    let bullets = [];
-    let enemies = [];
-    let gameOver = false;
-    let score = 0;
+# Bullet settings
+bullets = []
+bullet_speed = 7
 
-    // Create enemies
-    function createEnemies() {
-      for (let row = 0; row < enemyRows; row++) {
-        for (let col = 0; col < enemyCols; col++) {
-          enemies.push({
-            x: col * (playerWidth + enemyPadding) + 50,
-            y: row * (playerHeight + enemyPadding) + 50,
-            width: playerWidth,
-            height: playerHeight,
-            alive: true
-          });
-        }
-      }
-    }
+# Enemy settings
+enemies = []
+enemy_width = 50
+enemy_height = 20
+enemy_speed = 2
+rows = 3
+cols = 8
+enemy_padding = 20
 
-    // Draw player
-    function drawPlayer() {
-      ctx.fillStyle = 'white';
-      ctx.fillRect(playerX, canvas.height - 50, playerWidth, playerHeight);
-    }
+# Score
+score = 0
+font = pygame.font.Font(None, 36)
 
-    // Draw bullets
-    function drawBullets() {
-      ctx.fillStyle = 'red';
-      bullets.forEach(bullet => {
-        ctx.fillRect(bullet.x, bullet.y, 5, 10);
-      });
-    }
+# Create enemies
+def create_enemies():
+    for row in range(rows):
+        for col in range(cols):
+            enemies.append({
+                "x": col * (player_width + enemy_padding) + 50,
+                "y": row * (player_height + enemy_padding) + 50,
+                "alive": True
+            })
 
-    // Draw enemies
-    function drawEnemies() {
-      ctx.fillStyle = 'green';
-      enemies.forEach(enemy => {
-        if (enemy.alive) {
-          ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
-        }
-      });
-    }
+# Draw player
+def draw_player():
+    pygame.draw.rect(screen, WHITE, (player_x, player_y, player_width, player_height))
 
-    // Move bullets
-    function moveBullets() {
-      bullets.forEach((bullet, index) => {
-        bullet.y -= bulletSpeed;
-        if (bullet.y < 0) {
-          bullets.splice(index, 1);
-        }
-      });
-    }
+# Draw bullets
+def draw_bullets():
+    for bullet in bullets:
+        pygame.draw.rect(screen, RED, (bullet["x"], bullet["y"], 5, 10))
 
-    // Check collisions
-    function checkCollisions() {
-      bullets.forEach((bullet, bulletIndex) => {
-        enemies.forEach((enemy, enemyIndex) => {
-          if (
-            enemy.alive &&
-            bullet.x < enemy.x + enemy.width &&
-            bullet.x + 5 > enemy.x &&
-            bullet.y < enemy.y + enemy.height &&
-            bullet.y + 10 > enemy.y
-          ) {
-            // Collision detected
-            bullets.splice(bulletIndex, 1);
-            enemy.alive = false;
-            score += 10;
-          }
-        });
-      });
-    }
+# Draw enemies
+def draw_enemies():
+    for enemy in enemies:
+        if enemy["alive"]:
+            pygame.draw.rect(screen, GREEN, (enemy["x"], enemy["y"], enemy_width, enemy_height))
 
-    // Move enemies
-    function moveEnemies() {
-      enemies.forEach(enemy => {
-        enemy.x += enemySpeed;
-      });
+# Move bullets
+def move_bullets():
+    for bullet in bullets:
+        bullet["y"] -= bullet_speed
 
-      // Reverse direction if enemies hit the edge
-      const edgeHit = enemies.some(enemy => {
-        return enemy.alive && (enemy.x <= 0 || enemy.x + enemy.width >= canvas.width);
-      });
+# Check collisions
+def check_collisions():
+    global score
+    for bullet in bullets[:]:
+        for enemy in enemies:
+            if (
+                enemy["alive"]
+                and bullet["x"] < enemy["x"] + enemy_width
+                and bullet["x"] + 5 > enemy["x"]
+                and bullet["y"] < enemy["y"] + enemy_height
+                and bullet["y"] + 10 > enemy["y"]
+            ):
+                bullets.remove(bullet)
+                enemy["alive"] = False
+                score += 10
 
-      if (edgeHit) {
-        enemySpeed *= -1;
-        enemies.forEach(enemy => {
-          enemy.y += 20; // Move enemies down
-        });
-      }
-    }
+# Move enemies
+def move_enemies():
+    global enemy_speed
+    for enemy in enemies:
+        enemy["x"] += enemy_speed
 
-    // Check game over
-    function checkGameOver() {
-      const invasion = enemies.some(enemy => {
-        return enemy.alive && enemy.y + enemy.height >= canvas.height - 50;
-      });
+    # Reverse direction if enemies hit the edge
+    edge_hit = any(
+        enemy["alive"] and (enemy["x"] <= 0 or enemy["x"] + enemy_width >= SCREEN_WIDTH)
+        for enemy in enemies
+    )
 
-      if (invasion) {
-        gameOver = true;
-        alert(`Game Over! Your Score: ${score}`);
-        document.location.reload();
-      }
-    }
+    if edge_hit:
+        enemy_speed *= -1
+        for enemy in enemies:
+            enemy["y"] += 20  # Move enemies down
 
-    // Game loop
-    function gameLoop() {
-      if (gameOver) return;
+# Check game over
+def check_game_over():
+    for enemy in enemies:
+        if enemy["alive"] and enemy["y"] + enemy_height >= player_y:
+            return True
+    return False
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+# Main game loop
+create_enemies()
+running = True
+while running:
+    screen.fill(BLACK)
 
-      drawPlayer();
-      drawBullets();
-      drawEnemies();
+    # Event handling
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-      moveBullets();
-      moveEnemies();
-      checkCollisions();
-      checkGameOver();
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT] and player_x > 0:
+        player_x -= player_speed
+    if keys[pygame.K_RIGHT] and player_x < SCREEN_WIDTH - player_width:
+        player_x += player_speed
+    if keys[pygame.K_SPACE]:
+        bullets.append({"x": player_x + player_width // 2 - 2.5, "y": player_y})
 
-      requestAnimationFrame(gameLoop);
-    }
+    # Update game state
+    move_bullets()
+    move_enemies()
+    check_collisions()
 
-    // Event listeners
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowLeft' && playerX > 0) {
-        playerX -= playerSpeed;
-      } else if (e.key === 'ArrowRight' && playerX < canvas.width - playerWidth) {
-        playerX += playerSpeed;
-      } else if (e.key === ' ') {
-        bullets.push({ x: playerX + playerWidth / 2 - 2.5, y: canvas.height - 50 });
-      }
-    });
+    # Draw everything
+    draw_player()
+    draw_bullets()
+    draw_enemies()
 
-    // Initialize game
-    createEnemies();
-    gameLoop();
-  </script>
-</body>
-</html>
+    # Display score
+    score_text = font.render(f"Score: {score}", True, WHITE)
+    screen.blit(score_text, (10, 10))
+
+    # Check game over
+    if check_game_over():
+        game_over_text = font.render("GAME OVER", True, RED)
+        screen.blit(game_over_text, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2))
+        pygame.display.flip()
+        pygame.time.wait(2000)
+        running = False
+
+    # Update display
+    pygame.display.flip()
+    clock.tick(60)
+
+pygame.quit()
