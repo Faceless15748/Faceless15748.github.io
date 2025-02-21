@@ -1,161 +1,138 @@
-import pygame
-import random
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
 
-# Initialize PyGame
-pygame.init()
+    canvas {
+      border: 2px solid white;
+      background-color: #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="400" height="400"></canvas>
 
-# Screen dimensions
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Space Invaders")
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
 
-# Colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
+    // Game variables
+    const gridSize = 20;
+    const tileCount = canvas.width / gridSize;
 
-# Clock for controlling frame rate
-clock = pygame.time.Clock()
+    let snake = [{ x: 10, y: 10 }];
+    let food = { x: 5, y: 5 };
+    let direction = { x: 0, y: 0 };
+    let score = 0;
 
-# Player settings
-player_width = 50
-player_height = 20
-player_x = SCREEN_WIDTH // 2 - player_width // 2
-player_y = SCREEN_HEIGHT - 50
-player_speed = 5
+    // Draw the snake
+    function drawSnake() {
+      ctx.fillStyle = 'lime';
+      snake.forEach(segment => {
+        ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+      });
+    }
 
-# Bullet settings
-bullets = []
-bullet_speed = 7
+    // Draw the food
+    function drawFood() {
+      ctx.fillStyle = 'red';
+      ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+    }
 
-# Enemy settings
-enemies = []
-enemy_width = 50
-enemy_height = 20
-enemy_speed = 2
-rows = 3
-cols = 8
-enemy_padding = 20
+    // Move the snake
+    function moveSnake() {
+      const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
 
-# Score
-score = 0
-font = pygame.font.Font(None, 36)
+      // Check for collisions with walls or itself
+      if (
+        head.x < 0 || head.x >= tileCount ||
+        head.y < 0 || head.y >= tileCount ||
+        snake.some(segment => segment.x === head.x && segment.y === head.y)
+      ) {
+        resetGame();
+        return;
+      }
 
-# Create enemies
-def create_enemies():
-    for row in range(rows):
-        for col in range(cols):
-            enemies.append({
-                "x": col * (player_width + enemy_padding) + 50,
-                "y": row * (player_height + enemy_padding) + 50,
-                "alive": True
-            })
+      snake.unshift(head);
 
-# Draw player
-def draw_player():
-    pygame.draw.rect(screen, WHITE, (player_x, player_y, player_width, player_height))
+      // Check if the snake eats the food
+      if (head.x === food.x && head.y === food.y) {
+        score++;
+        placeFood();
+      } else {
+        snake.pop();
+      }
+    }
 
-# Draw bullets
-def draw_bullets():
-    for bullet in bullets:
-        pygame.draw.rect(screen, RED, (bullet["x"], bullet["y"], 5, 10))
+    // Place food randomly
+    function placeFood() {
+      food.x = Math.floor(Math.random() * tileCount);
+      food.y = Math.floor(Math.random() * tileCount);
 
-# Draw enemies
-def draw_enemies():
-    for enemy in enemies:
-        if enemy["alive"]:
-            pygame.draw.rect(screen, GREEN, (enemy["x"], enemy["y"], enemy_width, enemy_height))
+      // Ensure food doesn't spawn on the snake
+      if (snake.some(segment => segment.x === food.x && segment.y === food.y)) {
+        placeFood();
+      }
+    }
 
-# Move bullets
-def move_bullets():
-    for bullet in bullets:
-        bullet["y"] -= bullet_speed
+    // Reset the game
+    function resetGame() {
+      snake = [{ x: 10, y: 10 }];
+      direction = { x: 0, y: 0 };
+      score = 0;
+      placeFood();
+    }
 
-# Check collisions
-def check_collisions():
-    global score
-    for bullet in bullets[:]:
-        for enemy in enemies:
-            if (
-                enemy["alive"]
-                and bullet["x"] < enemy["x"] + enemy_width
-                and bullet["x"] + 5 > enemy["x"]
-                and bullet["y"] < enemy["y"] + enemy_height
-                and bullet["y"] + 10 > enemy["y"]
-            ):
-                bullets.remove(bullet)
-                enemy["alive"] = False
-                score += 10
+    // Game loop
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-# Move enemies
-def move_enemies():
-    global enemy_speed
-    for enemy in enemies:
-        enemy["x"] += enemy_speed
+      drawSnake();
+      drawFood();
+      moveSnake();
 
-    # Reverse direction if enemies hit the edge
-    edge_hit = any(
-        enemy["alive"] and (enemy["x"] <= 0 or enemy["x"] + enemy_width >= SCREEN_WIDTH)
-        for enemy in enemies
-    )
+      // Display score
+      ctx.fillStyle = 'white';
+      ctx.font = '20px Arial';
+      ctx.fillText(`Score: ${score}`, 10, 20);
 
-    if edge_hit:
-        enemy_speed *= -1
-        for enemy in enemies:
-            enemy["y"] += 20  # Move enemies down
+      setTimeout(gameLoop, 100);
+    }
 
-# Check game over
-def check_game_over():
-    for enemy in enemies:
-        if enemy["alive"] and enemy["y"] + enemy_height >= player_y:
-            return True
-    return False
+    // Handle keyboard input
+    document.addEventListener('keydown', event => {
+      switch (event.key) {
+        case 'ArrowUp':
+          if (direction.y === 0) direction = { x: 0, y: -1 };
+          break;
+        case 'ArrowDown':
+          if (direction.y === 0) direction = { x: 0, y: 1 };
+          break;
+        case 'ArrowLeft':
+          if (direction.x === 0) direction = { x: -1, y: 0 };
+          break;
+        case 'ArrowRight':
+          if (direction.x === 0) direction = { x: 1, y: 0 };
+          break;
+      }
+    });
 
-# Main game loop
-create_enemies()
-running = True
-while running:
-    screen.fill(BLACK)
-
-    # Event handling
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_LEFT] and player_x > 0:
-        player_x -= player_speed
-    if keys[pygame.K_RIGHT] and player_x < SCREEN_WIDTH - player_width:
-        player_x += player_speed
-    if keys[pygame.K_SPACE]:
-        bullets.append({"x": player_x + player_width // 2 - 2.5, "y": player_y})
-
-    # Update game state
-    move_bullets()
-    move_enemies()
-    check_collisions()
-
-    # Draw everything
-    draw_player()
-    draw_bullets()
-    draw_enemies()
-
-    # Display score
-    score_text = font.render(f"Score: {score}", True, WHITE)
-    screen.blit(score_text, (10, 10))
-
-    # Check game over
-    if check_game_over():
-        game_over_text = font.render("GAME OVER", True, RED)
-        screen.blit(game_over_text, (SCREEN_WIDTH // 2 - 100, SCREEN_HEIGHT // 2))
-        pygame.display.flip()
-        pygame.time.wait(2000)
-        running = False
-
-    # Update display
-    pygame.display.flip()
-    clock.tick(60)
-
-pygame.quit()
+    // Start the game
+    placeFood();
+    gameLoop();
+  </script>
+</body>
+</html>
