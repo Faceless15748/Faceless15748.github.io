@@ -117,22 +117,26 @@
     let direction = { x: 0, y: 0 };
     let score = 0;
 
-    // Draw the snake
-    function drawSnake() {
-      ctx.fillStyle = 'lime';
-      snake.forEach(segment => {
-        ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
-      });
+    // Smooth animation using requestAnimationFrame
+    let lastRenderTime = 0;
+    const gameSpeed = 7; // Lower = faster
+
+    function gameLoop(currentTime) {
+      const secondsSinceLastRender = (currentTime - lastRenderTime) / 1000;
+      if (secondsSinceLastRender < 1 / gameSpeed) {
+        requestAnimationFrame(gameLoop);
+        return;
+      }
+      lastRenderTime = currentTime;
+
+      updateGame();
+      drawGame();
+
+      requestAnimationFrame(gameLoop);
     }
 
-    // Draw the food
-    function drawFood() {
-      ctx.fillStyle = 'red';
-      ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
-    }
-
-    // Move the snake
-    function moveSnake() {
+    // Update game state
+    function updateGame() {
       const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
 
       // Check for collisions with walls or itself
@@ -156,6 +160,26 @@
       }
     }
 
+    // Draw everything on the canvas
+    function drawGame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw snake
+      ctx.fillStyle = 'lime';
+      snake.forEach(segment => {
+        ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
+      });
+
+      // Draw food
+      ctx.fillStyle = 'red';
+      ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
+
+      // Display score
+      ctx.fillStyle = 'white';
+      ctx.font = '20px Arial';
+      ctx.fillText(`Score: ${score}`, 10, 20);
+    }
+
     // Place food randomly
     function placeFood() {
       food.x = Math.floor(Math.random() * tileCount);
@@ -173,22 +197,6 @@
       direction = { x: 0, y: 0 };
       score = 0;
       placeFood();
-    }
-
-    // Game loop
-    function gameLoop() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      drawSnake();
-      drawFood();
-      moveSnake();
-
-      // Display score
-      ctx.fillStyle = 'white';
-      ctx.font = '20px Arial';
-      ctx.fillText(`Score: ${score}`, 10, 20);
-
-      setTimeout(gameLoop, 100);
     }
 
     // Handle keyboard input
@@ -216,7 +224,7 @@
 
     // Start the game
     placeFood();
-    gameLoop();
+    requestAnimationFrame(gameLoop);
   </script>
 </body>
 </html>
