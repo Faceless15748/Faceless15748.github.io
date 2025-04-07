@@ -71,6 +71,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      z-index: 10; /* Ensure buttons are clickable */
     }
 
     body.light-mode .dpad button {
@@ -171,10 +172,10 @@
     <!-- Mobile Controls -->
     <div class="controls">
       <div class="dpad">
-        <button class="up" onclick="setDirection('ArrowUp')">⬆️</button>
-        <button class="down" onclick="setDirection('ArrowDown')">⬇️</button>
-        <button class="left" onclick="setDirection('ArrowLeft')">⬅️</button>
-        <button class="right" onclick="setDirection('ArrowRight')">➡️</button>
+        <button class="up" ontouchstart="setDirection('ArrowUp')" onclick="setDirection('ArrowUp')">⬆️</button>
+        <button class="down" ontouchstart="setDirection('ArrowDown')" onclick="setDirection('ArrowDown')">⬇️</button>
+        <button class="left" ontouchstart="setDirection('ArrowLeft')" onclick="setDirection('ArrowLeft')">⬅️</button>
+        <button class="right" ontouchstart="setDirection('ArrowRight')" onclick="setDirection('ArrowRight')">➡️</button>
       </div>
     </div>
   </div>
