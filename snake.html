@@ -14,10 +14,16 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background-color: #121212; /* Dark premium background */
+      background-color: #121212; /* Default dark mode */
       color: #fff;
       line-height: 1.6;
       padding: 20px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    body.light-mode {
+      background-color: #f5f5f7; /* Light mode background */
+      color: #1d1d1f; /* Light mode text */
     }
 
     h1 {
@@ -37,7 +43,7 @@
     }
 
     .controls {
-      display: none;
+      display: flex;
       flex-direction: column;
       align-items: center;
       gap: 20px;
@@ -100,10 +106,30 @@
       transform: translateY(-50%);
     }
 
-    @media (max-width: 768px) {
-      .controls {
-        display: flex;
-      }
+    .settings {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .settings button {
+      background-color: #0071e3;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .settings button:hover {
+      background-color: #005bb5;
+    }
+
+    .high-score {
+      text-align: center;
+      font-size: 18px;
+      margin-bottom: 20px;
     }
   </style>
 </head>
@@ -111,6 +137,12 @@
   <div class="container">
     <!-- Header -->
     <h1>Snake Game</h1>
+
+    <!-- Settings -->
+    <div class="settings">
+      <button id="themeToggle">Switch to Light Mode</button>
+      <p class="high-score">High Score: <span id="highScore">0</span></p>
+    </div>
 
     <!-- Snake Game Canvas -->
     <canvas id="gameCanvas" width="400" height="400"></canvas>
@@ -138,6 +170,10 @@
     let food = { x: 5, y: 5 };
     let direction = { x: 0, y: 0 };
     let score = 0;
+
+    // High score tracking
+    let highScore = localStorage.getItem('highScore') || 0;
+    document.getElementById('highScore').textContent = highScore;
 
     // Smooth animation using requestAnimationFrame
     let lastRenderTime = 0;
@@ -176,6 +212,11 @@
       // Check if the snake eats the food
       if (head.x === food.x && head.y === food.y) {
         score++;
+        if (score > highScore) {
+          highScore = score;
+          localStorage.setItem('highScore', highScore);
+          document.getElementById('highScore').textContent = highScore;
+        }
         placeFood();
       } else {
         snake.pop();
@@ -243,6 +284,17 @@
           break;
       }
     }
+
+    // Theme toggle functionality
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light-mode');
+      if (document.body.classList.contains('light-mode')) {
+        themeToggle.textContent = 'Switch to Dark Mode';
+      } else {
+        themeToggle.textContent = 'Switch to Light Mode';
+      }
+    });
 
     // Start the game
     placeFood();
