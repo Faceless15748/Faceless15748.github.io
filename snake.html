@@ -73,13 +73,26 @@
       align-items: center;
     }
 
+    body.light-mode .dpad button {
+      background-color: #005bb5; /* Darker blue for light mode */
+      color: #fff;
+    }
+
     .dpad button:hover {
       background-color: #005bb5;
+    }
+
+    body.light-mode .dpad button:hover {
+      background-color: #00448c; /* Even darker blue for light mode hover */
     }
 
     .dpad button:active {
       background-color: #00448c;
       transform: scale(0.9);
+    }
+
+    body.light-mode .dpad button:active {
+      background-color: #003366; /* Even darker blue for light mode active */
     }
 
     .dpad .up {
@@ -122,8 +135,16 @@
       transition: background-color 0.3s ease;
     }
 
+    body.light-mode .settings button {
+      background-color: #005bb5; /* Darker blue for light mode */
+    }
+
     .settings button:hover {
       background-color: #005bb5;
+    }
+
+    body.light-mode .settings button:hover {
+      background-color: #00448c; /* Even darker blue for light mode hover */
     }
 
     .high-score {
