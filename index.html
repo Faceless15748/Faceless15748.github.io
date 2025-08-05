@@ -4,33 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My First Website</title>
-    <link rel="stylesheet" href="static/style.css">
-
-    <script>
-        let counter = 1;
-
-        function clickFirstButton() {
-            counter++;
-            document.getElementById("secondButton").innerHTML = "Alert Count: " + counter;
-            alert('您点击了按钮，干得好。现在您可以点击“确定/关闭”');
-        }
-
-        function clickSecondButton() {
-            alert("Number: " + counter);
-        }
-
-        function getAge() {
-            const today = new Date();
-            const birthYear = 2014;
-            let age = today.getFullYear() - birthYear;
-            return age;
-        }
-
-        document.addEventListener("DOMContentLoaded", function() {
-            const age = getAge();
-            document.getElementById("age").innerText = age;
-        });
-    </script>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script type="text/javascript" src="/static/js/general.js"></script>
 </head>
 <body>
     <div class="container">
@@ -59,15 +34,15 @@
         <h2>Certificates and Awards</h2>
         <p>Here are some of the certificates and awards I have achieved:</p>
         <ul>
-            <li>Game Dev Bootcamp with Godot & Python (GDScript) - 2025 Logiscool Cambridge, Stephen Perse Summer Enrichment Programme - <a href="./static/ryan-godot-python-certificate-stephen-perse2025-08-01 12.40.34.jpg" target="_blank">View Certificate</a></li>
-            <li>UK Bebras Challenge - 2023 - Distinction (114 Points) - <a href="./static/ryan-uk-bebras-challenge-2023-distinction.jpg" target="_blank">View Certificate</a></li>
-            <li>UK Bebras Challenge - 2022 - Distinction (109 Points) - <a href="./static/ryan-uk-bebras-challenge-2022-distinction.jpg" target="_blank">View Certificate</a></li>
+            <li>Game Dev Bootcamp with Godot & Python (GDScript) - 2025 Logiscool Cambridge, Stephen Perse Summer Enrichment Programme - <a href="./static/files/ryan-godot-python-certificate-stephen-perse2025-08-01 12.40.34.jpg" target="_blank">View Certificate</a></li>
+            <li>UK Bebras Challenge - 2023 - Distinction (114 Points) - <a href="./static/files/ryan-uk-bebras-challenge-2023-distinction.jpg" target="_blank">View Certificate</a></li>
+            <li>UK Bebras Challenge - 2022 - Distinction (109 Points) - <a href="./static/files/ryan-uk-bebras-challenge-2022-distinction.jpg" target="_blank">View Certificate</a></li>
         </ul>
 
         <h2>Games Created with AI</h2>
         <ul>
-            <li><a href="minesweeper.html">Minesweeper</a></li>
-            <li><a href="snake.html">Snake</a></li>
+            <li><a href="/games/minesweeper.html">Minesweeper</a></li>
+            <li><a href="/games/snake.html">Snake</a></li>
         </ul>
     </div>
 </body>
